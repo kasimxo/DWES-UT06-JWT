@@ -6,6 +6,7 @@
 - [Modificaciones](#modificaciones)
   - [Parte 1](#parte-1)
   - [Parte 2](#parte-2)
+  - [Parte 3](#parte-3)
 - [Resultado final](#resultado-final)
 - [Explicación de la ejecución del script](#expicación-de-la-ejecución-del-script)
 
@@ -65,7 +66,7 @@ Primero se ha creado el archivo [Serializers.py](./tarea-planner/tarea_planner/s
 
 Depués se han modificado las [vistas correspondientes a los usuarios](./tarea-planner/tarea_planner/views/usuarios.py) para utilizar la autenticación por token JWT.
 
-Y se han modificado y agregado las nuevas rutas al archivo [tarea_planner/urls.py].
+Se han modificado y agregado las nuevas rutas al archivo [tarea_planner/urls.py].
 
 ### Parte 3:
 
@@ -80,6 +81,18 @@ Al probar el endpoint POST /api/users/ con usuario y contraseña correcto e inco
 ![Endpoint /api/users/](./docs/resultado_parte_1.png)
 
 ## Resultado parte 2
+
+Primero probamos a hacer el GET de users sin token:
+
+![GET users sin token JWT](./docs/resultado_parte_2_1.png)
+
+Después conseguimos un token JWT:
+
+![POST token JWT](./docs/resultado_parte_2_2.png)
+
+Y por último recuperamos el listado de usuarios haciendo la petición con el token obtenido:
+
+![GET users con token JWT](./docs/resultado_parte_2_3.png)
 
 ## Resultado final
 
