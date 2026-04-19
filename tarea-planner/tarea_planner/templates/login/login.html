@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %} Inicio - Tarea Planner {% endblock %}
+
+{% block content %}
+
+{% if form.errors %}
+    <p>Usuario o contraseña incorrectos.</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Iniciar sesión</button>
+</form>
+
+<p>¿No tienes una cuenta? <a href="{% url 'register' %}">Registrarte</a></p>
+
+{% endblock %}

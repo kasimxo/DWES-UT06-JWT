@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %} Perfil - Tarea Planner {% endblock %}
+
+{% block content %}
+<p><strong>Nombre:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</p>
+<p><strong>Correo electrónico:</strong> {{ usuario.email }}</p>
+<p><strong>Rol:</strong> {{ usuario.role }}</p>
+{% endblock %}

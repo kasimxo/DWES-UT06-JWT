@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %} Tareas - Tarea Planner {% endblock %}
+
+{% block content %}
+
+<style>
+    .tabla-tareas {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .tabla-tareas th, .tabla-tareas td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .tabla-tareas th {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<a href="{% url 'create_tarea' %}" style="align-self: flex-end; margin-bottom: 20px;">
+    <button style="
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight:bold;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+        Crear nueva tarea
+    </button>
+</a>
+
+<!-- Listado tareas -->
+<h2>Listado de tareas</h2>
+
+<table class="tabla-tareas">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Fecha de Vencimiento</th>
+            <th>Creada por</th>
+            <th>Asignada a</th>
+            <th>Acciones</th>
+            <th>Evaluación</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for tarea in tareas %}
+        <tr>
+            <td>{{ tarea.title }}</td>
+            <td>{{ tarea.description }}</td>
+            <td>{{ tarea.due_date }}</td>
+            <td>{{ tarea.created_by }}</td>
+            <td>
+                <div style="display: flex; flex-direction: column;">
+                {% for usuario in tarea.assigned_to.all %}
+                    <div>
+                        {{ usuario }}
+                    </div>
+                {% endfor %}
+                </div>
+            </td>
+            <td>
+                {% if tarea.finished_at is null %}
+                    <!-- La tarea no está finalizada, se puede editar -->
+                    {% if user.role == 'student' %}
+                        <a href="{% url 'completar_tarea' tarea.id %}">
+                            <button style="
+                            padding: 5px 10px;
+                            background-color: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-weight:bold;
+                            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);">
+                                Completar
+                            </button>
+                        </a>
+                    {% else %}                        
+                        <a href="{% url 'editar_tarea' tarea.id %}">
+                            <button style="
+                            padding: 5px 10px;
+                            background-color: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-weight:bold;
+                            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);">
+                                Editar
+                            </button>
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <!-- La tarea está finalizada, no se puede editar, solo ver -->
+                    <a href="{% url 'detalle_tarea' tarea.id %}">
+                        <button style="
+                            padding: 5px 10px;
+                            background-color: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-weight:bold;
+                            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);">
+                            Ver
+                        </button>
+                    </a>
+                {% endif %}
+            </td>
+            <td>
+                {% if tarea.estado_evaluacion == 'Pendiente'%}
+                    <a href="{% url 'evaluar_tarea' tarea.id %}">
+                        <button style="
+                            padding: 5px 10px;
+                            background-color: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-weight:bold;
+                            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);">
+                            Evaluar
+                        </button>
+                    </a>
+                {% else %}
+                    {{ tarea.estado_evaluacion}}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

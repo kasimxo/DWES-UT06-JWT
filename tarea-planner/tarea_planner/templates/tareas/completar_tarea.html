@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %} Completar Tarea - Tarea Planner {% endblock %}
+
+{% block content %}
+
+<!-- 
+Formulario para editar la tarea
+Según el rol del usuario:
+    - Profesor: Puede editar la tarea (título, descripción, fecha entrega...)
+    - Estudiante: Solo puede "trabajar" en la tarea (entregar, añadir respuesta...)
+    - Estudiante & creador: Ve un botón que le permite hacer los campos como editables
+-->
+<div style="
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px;
+">
+    {% if user.role == 'student' and user == tarea.created_by %}
+        <a href="{% url 'editar_tarea' tarea.id %}" style="align-self: flex-end;">
+                <button type="button" style="
+                padding: 10px 20px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight:bold;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                    Editar 
+                </button>
+            </a>
+    {% endif %}
+    <form method="post" action="{% url 'completar_tarea' tarea.id %}">
+    {% csrf_token %}
+        
+        <div style="
+            display: flex; 
+            flex-direction: row;
+            gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <h2>{{ tarea.title }}</h2>
+                <p>{{ tarea.description }}</p>
+                <textarea id="respuesta" name="respuesta"  required>{% if tarea.answer is not None %} {{ tarea.answer }} {% endif %}</textarea>
+            </div>
+            <div>
+                <p>Fecha de Vencimiento: {{ tarea.due_date }}</p>
+            </div>
+        </div>
+        <div style="
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            width: 100%;
+            gap:25px
+            ">
+            <a href="{% url 'tareas' %}">
+                <button type="button" style="
+                padding: 10px 20px;
+                background-color: #8c8f92ff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight:bold;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                    Cancelar 
+                </button>
+            </a>
+            <button type="submit" name="action" value="guardar" style="
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight:bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                Guardar 
+            </button>   
+            <button type="button" id="modal-tarea-btn" name="action" style="
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight:bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                Entregar 
+            </button>          
+        </div>
+        <!-- Modal de confirmación de entrega de tarea -->
+        <div id="confirmacion-entrega-modal" style="
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            ">
+            <div style="
+                background-color: white;
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                display: flex;
+                flex-direction: column;
+                gap: 20px; 
+                margin: auto;
+                max-width: 400px;
+                min-width: 200px;
+                ">
+                <div>
+                    <h3>Confirmación de entrega</h3>
+                    <p>¿Estás seguro de que deseas entregar la tarea?</p>
+                    <p>Una vez entregada, no podrás modificarla.</p>
+                </div>
+                <div style="display: flex; flex-direction: row; justify-content: center; gap: 10px;">
+                    <button type="button" id="cancelar-entrega-btn" style="
+                        padding: 10px 20px;
+                        background-color: #8c8f92ff;
+                        color: white;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight:bold;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                        Cancelar
+                    </button>
+                    <button type="submit" name="action" value="entregar" id="entregar-tarea-btn" style="
+                        padding: 10px 20px;
+                        background-color: #28a745;
+                        color: white;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight:bold;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                        Sí, entregar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+const modalTareaBtn = document.getElementById('modal-tarea-btn');
+const entregarTareaBtn = document.getElementById('entregar-tarea-btn');
+const modalConfirmacion = document.getElementById('confirmacion-entrega-modal');
+const cancelarEntregaBtn = document.getElementById('cancelar-entrega-btn');
+
+modalTareaBtn.addEventListener('click', () => {
+    modalConfirmacion.style.display = 'flex';
+});
+cancelarEntregaBtn.addEventListener('click', () => {
+    modalConfirmacion.style.display = 'none';
+});
+</script>
+{% endblock %}

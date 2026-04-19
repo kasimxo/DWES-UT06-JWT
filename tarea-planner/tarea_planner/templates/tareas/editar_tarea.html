@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %} Editar Tarea - Tarea Planner {% endblock %}
+
+{% block content %}
+
+<!-- 
+Formulario para editar la tarea
+Según el rol del usuario:
+    - Profesor: Puede editar la tarea (título, descripción, fecha entrega...)
+    - Estudiante: Solo puede "trabajar" en la tarea (entregar, añadir respuesta...)
+    - Estudiante & creador: Ve un botón que le permite hacer los campos como editables
+-->
+<form method="post" action="{% url 'editar_tarea' tarea.id %}">
+    {% csrf_token %}
+    <div style="
+        display: flex;
+        flex-direction: row;
+        gap: 50px;">
+        <div style="
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        ">
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" name="titulo" value="{{ tarea.title }}" required>
+
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" required>{{ tarea.description }}</textarea>
+
+            <label for="fecha_vencimiento">Fecha de vencimiento:</label>
+            <input type="date" id="fecha_vencimiento" name="fecha_vencimiento" value="{{ tarea.due_date|date:'Y-m-d' }}" required>
+
+            <label for="es_evaluable">Evaluable:</label>
+            <select id="es_evaluable" name="es_evaluable">
+                <option value="false" {% if not tarea.is_evaluable %}selected{% endif %}>No evaluable</option>
+                <!-- Solo un profesor puede hacer tareas evaluables -->
+                {% if user.role == 'teacher' %}
+                    <option value="true" {% if tarea.is_evaluable %}selected{% endif %}>Evaluable</option>
+                {% endif %}                
+            </select>
+        </div>
+        <div>
+            <label for="grupal">Tarea grupal:</label>
+            <input type="checkbox" id="grupal" name="grupal" {% if tarea.grupal %}checked{% endif %}>
+
+            <p>Asignar a usuario(s):</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>
+                            <input type="{% if tarea.grupal %}checkbox{% else %}radio{% endif %}" name="usuarios_asignados" value="{{ user.id }}" class="user-input" {% if user in tarea.assigned_to.all %}checked{% endif %}>
+                        </td>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>    
+        </div>
+    </div>
+    <div style="
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        width: 100%;
+        gap:25px
+        ">
+        <a href="{% url 'tareas' %}">
+            <button type="button" style="
+            padding: 10px 20px;
+            background-color: #8c8f92ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight:bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+                Cancelar 
+            </button>
+        </a>
+        <button type="submit" name="action" value="editar" style="
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight:bold;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+            Guardar 
+        </button>        
+    </div>
+</form>
+
+<script>
+    // Esta sección se debería sacar a archivos externos
+
+    const grupalCheckbox = document.getElementById('grupal');
+    const userInputs = document.querySelectorAll('.user-input');
+
+    grupalCheckbox.addEventListener('change', function() {
+        userInputs.forEach(input => {
+            input.type = this.checked ? 'checkbox' : 'radio';
+            input.checked = false; // Desmarcar todos cuando se cambia el tipo
+        });
+    });
+</script>
+
+{% endblock %}

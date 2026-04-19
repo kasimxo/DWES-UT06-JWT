@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %} Tarea - Tarea Planner {% endblock %}
+
+{% block content %}
+
+<!-- 
+Formulario para editar la tarea
+Según el rol del usuario:
+    - Profesor: Puede evaluar la tarea???
+    - Estudiante: solo puede ver
+-->
+
+<h2>{{ tarea.title }}</h2>
+<div style="
+display: flex;
+flex-direction: row;
+gap: 20px;">
+    <div style="
+    display: flex;
+    flex:2;
+    flex-direction: column;
+    ">
+        <h3>Descripción:</h3>
+        <b>Enunciado:</b>
+        <p>{{ tarea.description }}</p>
+        <div>
+            <b>Respuesta:</b>
+            <p>{% if tarea.answer is not None %} {{ tarea.answer }} {% else %} No hay respuesta entregada. {% endif %}</p>
+        </div>
+    </div>
+    <div style="
+    display: flex;
+    flex:1;
+    flex-direction: column;
+    ">
+        <h3>Detalles:</h3>
+        <b>Fecha de entrega:</b>
+        <p>{{ tarea.finished_at }}</p>
+        <b>Fecha de Vencimiento:</b>
+        <p>{{ tarea.due_date }}</p>
+        <b>Creada por:</b>
+        <p>{{ tarea.created_by }}</p>
+        <div>
+            <b>Asignada a:</b>
+            <ul>
+            {% for usuario in tarea.assigned_to.all %}
+                <li>{{ usuario }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

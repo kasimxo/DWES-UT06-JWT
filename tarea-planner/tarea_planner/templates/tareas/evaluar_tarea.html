@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %} Tarea - Tarea Planner {% endblock %}
+
+{% block content %}
+
+<!-- 
+Formulario para editar la tarea
+Según el rol del usuario:
+    - Profesor: Puede evaluar la tarea???
+    - Estudiante: solo puede ver
+-->
+<div style="
+    display: flex;
+    gap: 50px;
+    ">
+    <div>
+        <h2>{{ tarea.title }}</h2>
+        <p>{{ tarea.description }}</p>
+        <p>Fecha de Vencimiento: {{ tarea.due_date }}</p>
+        <p>Creada por: {{ tarea.created_by }}</p>
+        <div>
+            <h3>Asignada a:</h3>
+            <ul>
+            {% for usuario in tarea.assigned_to.all %}
+                <li>{{ usuario }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <h3>Respuesta:</h3>
+            <p>{% if tarea.answer is not None %} {{ tarea.answer }} {% else %} No hay respuesta entregada. {% endif %}</p>
+        </div>
+    </div>
+    <form method="post" action="{% url 'evaluar_tarea' tarea.id %}" style="
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 25px;
+        margin-top: 25px;
+        ">
+        {% csrf_token %}
+        <div>
+            <label for="calificacion">Calificación:</label>
+            <select id="calificacion" name="calificacion" required>
+                <option value="">Seleccione una calificación</option>
+                <option value="apto">Apto</option>
+                <option value="no_apto">No Apto</option>
+            </select>
+        </div>
+        <button type="submit" style="
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight:bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+            Evaluar 
+        </button>
+    </form>
+</div>
+
+{% endblock %}

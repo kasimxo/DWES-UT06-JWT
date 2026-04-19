@@ -1,0 +1,9 @@
+from django.shortcuts import render, redirect
+from django.views import View
+
+class HomeView(View):
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect("tareas")
+        return render(request, "home/home.html", {"page_title": "Tarea Planner"})
