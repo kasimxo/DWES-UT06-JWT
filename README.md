@@ -3,12 +3,83 @@
 ## Índice
 
 - [Introducción](#introducción)
+- [Modificaciones](#modificaciones)
+  - [Parte 1](#parte-1)
+  - [Parte 2](#parte-2)
 - [Resultado final](#resultado-final)
 - [Explicación de la ejecución del script](#expicación-de-la-ejecución-del-script)
 
 ## Introducción
 
 En esta práctica se implementa la autenticación a través de token JWT sobre la aplicación construida en la práctica [UT04 Persistencia de datos](https://github.com/kasimxo/DWES-UT04-Persistencia-de-datos).
+
+
+## Modificaciones
+
+### Parte 1:
+
+En un primer lugar se han añadido las dependencias correspondientes:
+
+```
+pip install djangorestframework djangorestframework-simplejwt
+```
+
+Después se ha modificado la configuración del archivo [settings.py](./tarea-planner/config/settings.py) para agregar las nuevas apps, la configuración del rest_framework y la configuración del token jwt:
+
+```
+INSTALLED_APPS = [
+    ...
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Por defecto, todo requiere auth
+    ],
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+```
+
+Se han añadido las nuevas rutas al archivo [config/urls.py](./tarea-planner/config/urls.py).
+
+
+A continuación se han aplicado las migraciones correspondientes.
+
+### Parte 2:
+
+Primero se ha creado el archivo [Serializers.py](./tarea-planner/tarea_planner/serializers.py).
+
+Depués se han modificado las [vistas correspondientes a los usuarios](./tarea-planner/tarea_planner/views/usuarios.py) para utilizar la autenticación por token JWT.
+
+Y se han modificado y agregado las nuevas rutas al archivo [tarea_planner/urls.py].
+
+### Parte 3:
+
+Para implementar el logout en primer lugar se ha eliminado la lógica ya existente y después se ha agregado la clase LogoutView en el archivo de [vistas de usuarios](./tarea-planner/tarea_planner/views/usuarios.py).
+
+Por último se ha modificado la ruta de logout en el archivo [tarea_planner/urls.py].
+
+## Resultado parte 1
+
+Al probar el endpoint POST /api/users/ con usuario y contraseña correcto e incorrecto, podemos ver los dos tipos de respuesta que da:
+
+![Endpoint /api/users/](./docs/resultado_parte_1.png)
+
+## Resultado parte 2
 
 ## Resultado final
 
